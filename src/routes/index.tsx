@@ -92,7 +92,7 @@ function Index() {
         <h2 className="text-2xl font-bold">Verified Marketplace</h2>
         <p className="mb-5 text-sm text-muted-foreground">Prices in Pi, shown in {cur} at your reference rate.</p>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {LISTINGS.map((l) => (
+          {listings.map((l) => (
             <article key={l.id} className="overflow-hidden rounded-2xl bg-card shadow-card">
               <img src={l.img} alt={l.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />
               <div className="space-y-1 p-3">
@@ -100,7 +100,7 @@ function Index() {
                 <h3 className="text-sm font-semibold">{l.title}</h3>
                 <p className="flex items-center gap-1 text-[11px] text-accent-foreground"><BadgeCheck className="h-3 w-3" />@{l.seller} · {l.badge}</p>
                 <p className="font-display font-bold">π {l.price} <span className="text-xs font-normal text-muted-foreground">≈ {formatFiat(l.price, rate, cur)}</span></p>
-                <Button size="sm" className="w-full" onClick={() => initiateIFIOKEscrowPayment(l.price, l.title, `${l.id}-${Date.now()}`, setStatus)}>Buy with escrow</Button>
+                <Button size="sm" className="w-full" onClick={() => initiateIFIOKEscrowPayment(l.price, l.title, `IF${Date.now()}`, setStatus, l.id)}>Buy with escrow</Button>
               </div>
             </article>
           ))}
