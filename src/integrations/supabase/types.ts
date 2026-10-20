@@ -14,7 +14,154 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      escrow_orders: {
+        Row: {
+          amount_pi: number
+          buyer_uid: string | null
+          buyer_username: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          listing_id: string | null
+          order_code: string
+          pi_payment_id: string | null
+          release_at: string | null
+          seller_username: string | null
+          status: Database["public"]["Enums"]["escrow_status"]
+          submitted_at: string | null
+          txid: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_pi: number
+          buyer_uid?: string | null
+          buyer_username?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          order_code: string
+          pi_payment_id?: string | null
+          release_at?: string | null
+          seller_username?: string | null
+          status?: Database["public"]["Enums"]["escrow_status"]
+          submitted_at?: string | null
+          txid?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_pi?: number
+          buyer_uid?: string | null
+          buyer_username?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          order_code?: string
+          pi_payment_id?: string | null
+          release_at?: string | null
+          seller_username?: string | null
+          status?: Database["public"]["Enums"]["escrow_status"]
+          submitted_at?: string | null
+          txid?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          active: boolean
+          badge: string
+          category: string
+          created_at: string
+          delivery: string | null
+          id: string
+          image_url: string | null
+          price_pi: number
+          seller_username: string
+          stock: number | null
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          badge?: string
+          category: string
+          created_at?: string
+          delivery?: string | null
+          id?: string
+          image_url?: string | null
+          price_pi: number
+          seller_username: string
+          stock?: number | null
+          title: string
+        }
+        Update: {
+          active?: boolean
+          badge?: string
+          category?: string
+          created_at?: string
+          delivery?: string | null
+          id?: string
+          image_url?: string | null
+          price_pi?: number
+          seller_username?: string
+          stock?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      scam_reports: {
+        Row: {
+          created_at: string
+          description: string
+          evidence_urls: string[]
+          id: string
+          moderator_note: string | null
+          order_id: string | null
+          reporter_username: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["report_status"]
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          evidence_urls?: string[]
+          id?: string
+          moderator_note?: string | null
+          order_id?: string | null
+          reporter_username?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          evidence_urls?: string[]
+          id?: string
+          moderator_note?: string | null
+          order_id?: string | null
+          reporter_username?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scam_reports_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "escrow_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +170,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      escrow_status:
+        | "created"
+        | "deposited"
+        | "in_progress"
+        | "submitted"
+        | "completed"
+        | "disputed"
+        | "refunded"
+      report_status: "open" | "approved_release" | "refunded" | "dismissed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +305,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      escrow_status: [
+        "created",
+        "deposited",
+        "in_progress",
+        "submitted",
+        "completed",
+        "disputed",
+        "refunded",
+      ],
+      report_status: ["open", "approved_release", "refunded", "dismissed"],
+    },
   },
 } as const
