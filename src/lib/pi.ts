@@ -39,7 +39,12 @@ export async function piAuthenticate() {
     if (payment.transaction?.txid) post("/api/public/pi/complete-payment", { paymentId: payment.identifier, txid: payment.transaction.txid }).catch(console.error);
   });
   // Server re-verifies the access token against the Pi Platform API.
-  return post("/api/public/pi/verify-user", { accessToken: auth.accessToken }) as Promise<{ uid: string; username: string }>;
+  const u = (await post("/api/public/pi/verify-user", { accessToken: auth.accessToken })) as { uid: string; username: string };
+  return { ...u, accessToken: auth.accessToken };
+}
+
+export { post as piPost };
+export function _unused() {
 }
 
 export function initiateIFIOKEscrowPayment(amount: number, memo: string, orderId: string, onStatus: (s: string) => void, listingId?: string) {
