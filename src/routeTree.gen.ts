@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as ApiPublicPiApprovePaymentRouteImport } from './routes/api/public/pi/approve-payment'
 import { Route as ApiPublicPiCompletePaymentRouteImport } from './routes/api/public/pi/complete-payment'
 import { Route as ApiPublicPiVerifyUserRouteImport } from './routes/api/public/pi/verify-user'
@@ -17,6 +19,16 @@ import { Route as ApiPublicPiVerifyUserRouteImport } from './routes/api/public/p
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPiApprovePaymentRoute =
@@ -39,12 +51,16 @@ const ApiPublicPiVerifyUserRoute = ApiPublicPiVerifyUserRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -52,6 +68,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -60,18 +78,24 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/privacy-policy'
+    | '/terms-of-service'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/privacy-policy'
+    | '/terms-of-service'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
   id:
     | '__root__'
     | '/'
+    | '/privacy-policy'
+    | '/terms-of-service'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -79,6 +103,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
   ApiPublicPiApprovePaymentRoute: typeof ApiPublicPiApprovePaymentRoute
   ApiPublicPiCompletePaymentRoute: typeof ApiPublicPiCompletePaymentRoute
   ApiPublicPiVerifyUserRoute: typeof ApiPublicPiVerifyUserRoute
@@ -91,6 +117,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/pi/approve-payment': {
@@ -119,6 +159,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
   ApiPublicPiApprovePaymentRoute: ApiPublicPiApprovePaymentRoute,
   ApiPublicPiCompletePaymentRoute: ApiPublicPiCompletePaymentRoute,
   ApiPublicPiVerifyUserRoute: ApiPublicPiVerifyUserRoute,
