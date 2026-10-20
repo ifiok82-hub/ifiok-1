@@ -118,6 +118,21 @@ export type Database = {
         }
         Relationships: []
       }
+      moderators: {
+        Row: {
+          created_at: string
+          pi_username: string
+        }
+        Insert: {
+          created_at?: string
+          pi_username: string
+        }
+        Update: {
+          created_at?: string
+          pi_username?: string
+        }
+        Relationships: []
+      }
       scam_reports: {
         Row: {
           created_at: string
