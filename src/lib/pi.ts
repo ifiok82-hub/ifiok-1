@@ -16,7 +16,7 @@ let inited = false;
 export function getPi(): PiSDK | null {
   if (typeof window === "undefined" || !window.Pi) return null;
   if (!inited) {
-    window.Pi.init({ version: "2.0", sandbox: import.meta.env.VITE_PI_SANDBOX === "true" });
+    window.Pi.init({ version: "2.0", sandbox: import.meta.env["VITE_PI_SANDBOX"] === "true" });
     inited = true;
   }
   return window.Pi;

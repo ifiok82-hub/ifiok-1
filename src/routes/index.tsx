@@ -32,7 +32,7 @@ function Index() {
   const [frozen, setFrozen] = useState(false);
   useEffect(() => { setInPi(isPiBrowser() || !!getPi()); }, []);
 
-  const rate = rates[cur];
+  const rate = rates[cur] ?? 1;
   const signIn = async () => {
     try { const u = await piAuthenticate(); setUser(u.username); setStatus(`Signed in as @${u.username}`); }
     catch (e) { setStatus((e as Error).message); }

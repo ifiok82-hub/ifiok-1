@@ -8,7 +8,7 @@ export async function piFetch(path: string, init: RequestInit & { auth?: string 
   const r = await fetch(`${PI_API}${path}`, {
     method: init.method ?? "GET",
     headers: { Authorization: authHeader, "Content-Type": "application/json" },
-    body: init.body,
+    body: init.body ?? null,
   });
   const text = await r.text();
   return new Response(text, { status: r.status, headers: { "Content-Type": "application/json" } });
