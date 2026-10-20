@@ -10,7 +10,8 @@ export const Route = createFileRoute("/api/public/pi/complete-payment")({
         const r = await piFetch(`/payments/${paymentId}/complete`, { method: "POST", body: JSON.stringify({ txid }) });
         if (r.ok) {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          await supabaseAdmin.from("escrow_orders").update({ status: "deposited", txid }).eq("pi_payment_id", paymentId).eq("status", "created");
+          const release_at = new Date(Date.now() + 7 * 864e5).toISOString();
+          await supabaseAdmin.from("escrow_orders").update({ status: "deposited", txid, release_at }).eq("pi_payment_id", paymentId).eq("status", "created");
         }
         return r;
       },

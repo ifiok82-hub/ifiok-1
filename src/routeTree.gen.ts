@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
+import { Route as ApiPublicAdminReportsRouteImport } from './routes/api/public/admin/reports'
+import { Route as ApiPublicAdminResolveRouteImport } from './routes/api/public/admin/resolve'
 import { Route as ApiPublicEscrowReportRouteImport } from './routes/api/public/escrow/report'
+import { Route as ApiPublicJobsAutoReleaseRouteImport } from './routes/api/public/jobs/auto-release'
 import { Route as ApiPublicPiApprovePaymentRouteImport } from './routes/api/public/pi/approve-payment'
 import { Route as ApiPublicPiCompletePaymentRouteImport } from './routes/api/public/pi/complete-payment'
 import { Route as ApiPublicPiVerifyUserRouteImport } from './routes/api/public/pi/verify-user'
@@ -32,11 +35,27 @@ const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   path: '/terms-of-service',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAdminReportsRoute = ApiPublicAdminReportsRouteImport.update({
+  id: '/api/public/admin/reports',
+  path: '/api/public/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAdminResolveRoute = ApiPublicAdminResolveRouteImport.update({
+  id: '/api/public/admin/resolve',
+  path: '/api/public/admin/resolve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicEscrowReportRoute = ApiPublicEscrowReportRouteImport.update({
   id: '/api/public/escrow/report',
   path: '/api/public/escrow/report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsAutoReleaseRoute =
+  ApiPublicJobsAutoReleaseRouteImport.update({
+    id: '/api/public/jobs/auto-release',
+    path: '/api/public/jobs/auto-release',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPiApprovePaymentRoute =
   ApiPublicPiApprovePaymentRouteImport.update({
     id: '/api/public/pi/approve-payment',
@@ -59,7 +78,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/api/public/admin/reports': typeof ApiPublicAdminReportsRoute
+  '/api/public/admin/resolve': typeof ApiPublicAdminResolveRoute
   '/api/public/escrow/report': typeof ApiPublicEscrowReportRoute
+  '/api/public/jobs/auto-release': typeof ApiPublicJobsAutoReleaseRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -68,7 +90,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/api/public/admin/reports': typeof ApiPublicAdminReportsRoute
+  '/api/public/admin/resolve': typeof ApiPublicAdminResolveRoute
   '/api/public/escrow/report': typeof ApiPublicEscrowReportRoute
+  '/api/public/jobs/auto-release': typeof ApiPublicJobsAutoReleaseRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -78,7 +103,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/api/public/admin/reports': typeof ApiPublicAdminReportsRoute
+  '/api/public/admin/resolve': typeof ApiPublicAdminResolveRoute
   '/api/public/escrow/report': typeof ApiPublicEscrowReportRoute
+  '/api/public/jobs/auto-release': typeof ApiPublicJobsAutoReleaseRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -89,7 +117,10 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/api/public/admin/reports'
+    | '/api/public/admin/resolve'
     | '/api/public/escrow/report'
+    | '/api/public/jobs/auto-release'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -98,7 +129,10 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/api/public/admin/reports'
+    | '/api/public/admin/resolve'
     | '/api/public/escrow/report'
+    | '/api/public/jobs/auto-release'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -107,7 +141,10 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/api/public/admin/reports'
+    | '/api/public/admin/resolve'
     | '/api/public/escrow/report'
+    | '/api/public/jobs/auto-release'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -117,7 +154,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
+  ApiPublicAdminReportsRoute: typeof ApiPublicAdminReportsRoute
+  ApiPublicAdminResolveRoute: typeof ApiPublicAdminResolveRoute
   ApiPublicEscrowReportRoute: typeof ApiPublicEscrowReportRoute
+  ApiPublicJobsAutoReleaseRoute: typeof ApiPublicJobsAutoReleaseRoute
   ApiPublicPiApprovePaymentRoute: typeof ApiPublicPiApprovePaymentRoute
   ApiPublicPiCompletePaymentRoute: typeof ApiPublicPiCompletePaymentRoute
   ApiPublicPiVerifyUserRoute: typeof ApiPublicPiVerifyUserRoute
@@ -146,11 +186,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsOfServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/reports': {
+      id: '/api/public/admin/reports'
+      path: '/api/public/admin/reports'
+      fullPath: '/api/public/admin/reports'
+      preLoaderRoute: typeof ApiPublicAdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/resolve': {
+      id: '/api/public/admin/resolve'
+      path: '/api/public/admin/resolve'
+      fullPath: '/api/public/admin/resolve'
+      preLoaderRoute: typeof ApiPublicAdminResolveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/escrow/report': {
       id: '/api/public/escrow/report'
       path: '/api/public/escrow/report'
       fullPath: '/api/public/escrow/report'
       preLoaderRoute: typeof ApiPublicEscrowReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/jobs/auto-release': {
+      id: '/api/public/jobs/auto-release'
+      path: '/api/public/jobs/auto-release'
+      fullPath: '/api/public/jobs/auto-release'
+      preLoaderRoute: typeof ApiPublicJobsAutoReleaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/pi/approve-payment': {
@@ -181,7 +242,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
+  ApiPublicAdminReportsRoute: ApiPublicAdminReportsRoute,
+  ApiPublicAdminResolveRoute: ApiPublicAdminResolveRoute,
   ApiPublicEscrowReportRoute: ApiPublicEscrowReportRoute,
+  ApiPublicJobsAutoReleaseRoute: ApiPublicJobsAutoReleaseRoute,
   ApiPublicPiApprovePaymentRoute: ApiPublicPiApprovePaymentRoute,
   ApiPublicPiCompletePaymentRoute: ApiPublicPiCompletePaymentRoute,
   ApiPublicPiVerifyUserRoute: ApiPublicPiVerifyUserRoute,
