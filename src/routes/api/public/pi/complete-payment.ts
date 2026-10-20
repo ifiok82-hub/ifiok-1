@@ -7,7 +7,12 @@ export const Route = createFileRoute("/api/public/pi/complete-payment")({
       POST: async ({ request }) => {
         const { paymentId, txid } = await readJson(request);
         if (!isId(paymentId) || !isId(txid)) return new Response("Invalid input", { status: 400 });
-        return piFetch(`/payments/${paymentId}/complete`, { method: "POST", body: JSON.stringify({ txid }) });
+        const r = await piFetch(`/payments/${paymentId}/complete`, { method: "POST", body: JSON.stringify({ txid }) });
+        if (r.ok) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          await supabaseAdmin.from("escrow_orders").update({ status: "deposited", txid }).eq("pi_payment_id", paymentId).eq("status", "created");
+        }
+        return r;
       },
     },
   },

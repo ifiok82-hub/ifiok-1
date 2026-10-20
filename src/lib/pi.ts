@@ -42,11 +42,11 @@ export async function piAuthenticate() {
   return post("/api/public/pi/verify-user", { accessToken: auth.accessToken }) as Promise<{ uid: string; username: string }>;
 }
 
-export function initiateIFIOKEscrowPayment(amount: number, memo: string, orderId: string, onStatus: (s: string) => void) {
+export function initiateIFIOKEscrowPayment(amount: number, memo: string, orderId: string, onStatus: (s: string) => void, listingId?: string) {
   const Pi = getPi();
   if (!Pi) { onStatus("Please open IFIOK inside the Pi Browser to complete this transaction."); return; }
   Pi.createPayment(
-    { amount, memo: `IFIOK Escrow Order #${orderId}: ${memo}`, metadata: { orderId, type: "ESCROW_DEPOSIT" } },
+    { amount, memo: `IFIOK Escrow Order #${orderId}: ${memo}`, metadata: { orderId, listingId, type: "ESCROW_DEPOSIT" } },
     {
       onReadyForServerApproval: (paymentId) => { onStatus("Approving on server…"); post("/api/public/pi/approve-payment", { paymentId, orderId }).catch((e) => onStatus(e.message)); },
       onReadyForServerCompletion: (paymentId, txid) => { post("/api/public/pi/complete-payment", { paymentId, txid, orderId }).then(() => onStatus("Deposited — funds locked in escrow.")).catch((e) => onStatus(e.message)); },
