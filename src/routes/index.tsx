@@ -6,14 +6,24 @@ import { Footer } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { CURRENCIES, ESCROW_STAGES, IMAGES, LISTINGS, formatFiat, scanForFraud, type CurrencyCode } from "@/lib/ifiok";
 import { getPi, initiateIFIOKEscrowPayment, isPiBrowser, piAuthenticate } from "@/lib/pi";
+import { supabase } from "@/integrations/supabase/client";
+
+type Listing = { id: string; title: string; seller: string; badge: string; price: number; img: string; cat: string };
 
 export const Route = createFileRoute("/")({
+  loader: async (): Promise<{ listings: Listing[] }> => {
+    const { data, error } = await supabase.from("listings").select("id,title,seller_username,badge,category,price_pi,image_url").eq("active", true).order("created_at");
+    if (error || !data?.length) return { listings: LISTINGS.map((l) => ({ ...l })) };
+    return { listings: data.map((d) => ({ id: d.id, title: d.title, seller: d.seller_username, badge: d.badge, price: Number(d.price_pi), img: d.image_url ?? IMAGES.digital, cat: d.category })) };
+  },
   head: () => ({
     meta: [
       { title: "IFIOK — Pi Freelance Escrow & Micro-Services Hub" },
       { name: "description", content: "Empowering Global Commerce & Pi Utilities Safely. Hire, sell and trade with smart escrow and anti-scam protection." },
       { property: "og:title", content: "IFIOK — Pi Freelance Escrow & Micro-Services Hub" },
       { property: "og:description", content: "Empowering Global Commerce & Pi Utilities Safely." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: IMAGES.hero },
       { name: "twitter:image", content: IMAGES.hero },
     ],
@@ -22,6 +32,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { listings } = Route.useLoaderData();
   const [cur, setCur] = useState<CurrencyCode>("USD");
   const [rates, setRates] = useState<Record<string, number>>(Object.fromEntries(CURRENCIES.map((c) => [c.code, c.rate])));
   const [user, setUser] = useState<string | null>(null);

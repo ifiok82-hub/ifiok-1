@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
+import { Route as ApiPublicEscrowReportRouteImport } from './routes/api/public/escrow/report'
 import { Route as ApiPublicPiApprovePaymentRouteImport } from './routes/api/public/pi/approve-payment'
 import { Route as ApiPublicPiCompletePaymentRouteImport } from './routes/api/public/pi/complete-payment'
 import { Route as ApiPublicPiVerifyUserRouteImport } from './routes/api/public/pi/verify-user'
@@ -29,6 +30,11 @@ const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
   path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicEscrowReportRoute = ApiPublicEscrowReportRouteImport.update({
+  id: '/api/public/escrow/report',
+  path: '/api/public/escrow/report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPiApprovePaymentRoute =
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/api/public/escrow/report': typeof ApiPublicEscrowReportRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/api/public/escrow/report': typeof ApiPublicEscrowReportRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/api/public/escrow/report': typeof ApiPublicEscrowReportRoute
   '/api/public/pi/approve-payment': typeof ApiPublicPiApprovePaymentRoute
   '/api/public/pi/complete-payment': typeof ApiPublicPiCompletePaymentRoute
   '/api/public/pi/verify-user': typeof ApiPublicPiVerifyUserRoute
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/api/public/escrow/report'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/api/public/escrow/report'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/api/public/escrow/report'
     | '/api/public/pi/approve-payment'
     | '/api/public/pi/complete-payment'
     | '/api/public/pi/verify-user'
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
+  ApiPublicEscrowReportRoute: typeof ApiPublicEscrowReportRoute
   ApiPublicPiApprovePaymentRoute: typeof ApiPublicPiApprovePaymentRoute
   ApiPublicPiCompletePaymentRoute: typeof ApiPublicPiCompletePaymentRoute
   ApiPublicPiVerifyUserRoute: typeof ApiPublicPiVerifyUserRoute
@@ -131,6 +144,13 @@ declare module '@tanstack/react-router' {
       path: '/terms-of-service'
       fullPath: '/terms-of-service'
       preLoaderRoute: typeof TermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/escrow/report': {
+      id: '/api/public/escrow/report'
+      path: '/api/public/escrow/report'
+      fullPath: '/api/public/escrow/report'
+      preLoaderRoute: typeof ApiPublicEscrowReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/pi/approve-payment': {
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
+  ApiPublicEscrowReportRoute: ApiPublicEscrowReportRoute,
   ApiPublicPiApprovePaymentRoute: ApiPublicPiApprovePaymentRoute,
   ApiPublicPiCompletePaymentRoute: ApiPublicPiCompletePaymentRoute,
   ApiPublicPiVerifyUserRoute: ApiPublicPiVerifyUserRoute,
