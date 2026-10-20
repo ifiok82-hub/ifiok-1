@@ -2,7 +2,7 @@
 const PI_API = "https://api.minepi.com/v2";
 
 export async function piFetch(path: string, init: RequestInit & { auth?: string } = {}) {
-  const key = process.env.PI_API_KEY;
+  const key = process.env["PI_API_KEY"];
   const authHeader = init.auth ?? (key ? `Key ${key}` : null);
   if (!authHeader) return new Response("PI_API_KEY is not configured", { status: 503 });
   const r = await fetch(`${PI_API}${path}`, {
