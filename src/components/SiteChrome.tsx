@@ -22,6 +22,8 @@ export function LegalShell({ title, updated, children }: { title: string; update
 export function Footer() {
   return (
     <footer className="border-t bg-navy px-4 py-8 text-center text-xs text-navy-foreground/70">
+      <p className="mb-1 font-display text-base font-bold text-navy-foreground">IFIOK — Shop · Pay · Live Better</p>
+      <p className="mb-3">Contact: <a href="mailto:support@gasv.store" className="underline">support@gasv.store</a> · <a href="tel:+2348033584736" className="underline">+234 803 358 4736</a></p>
       <p className="mb-2">IFIOK is an independent app built for the Pi ecosystem. Not affiliated with Pi Network or its Core Team.</p>
       <div className="flex justify-center gap-4">
         <Link to="/privacy-policy" className="underline">Privacy Policy</Link>
