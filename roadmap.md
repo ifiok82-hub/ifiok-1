@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Rebrand to purple/gold "Shop, Pay, Live Better" + homepage like showcase image (categories, payment methods, security, contact)
+- [x] Rebrand to purple/gold "Shop, Pay, Live Better" + homepage like showcase image (categories, payment methods, security, contact)
 - [x] Use real contact: +2348033584736, support@gasv.store
 - [ ] Product pages, search, cart, checkout, order tracking, receipts, reviews
 - [ ] Seller registration, verified vendors, admin dashboard
