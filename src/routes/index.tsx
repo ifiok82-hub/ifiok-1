@@ -10,6 +10,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Listing = { id: string; title: string; seller: string; badge: string; price: number; img: string; cat: string };
 
+const u = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=400&q=70`;
+const CATEGORIES = [
+  { name: "Groceries", sub: "Fresh food & essentials", img: u("photo-1542838132-92c53300491e") },
+  { name: "Electronics", sub: "Phones & gadgets", img: u("photo-1498049794561-7780e7231661") },
+  { name: "Fashion", sub: "Men, women & kids", img: u("photo-1445205170230-053b83016050") },
+  { name: "Home & Living", sub: "Make your space better", img: u("photo-1556911220-bff31c812dba") },
+  { name: "Health & Beauty", sub: "Look good, feel good", img: u("photo-1596462502278-27bfdc403348") },
+  { name: "Services", sub: "Repairs, bills & more", img: u("photo-1581578731548-c64695cc6952") },
+];
+
 export const Route = createFileRoute("/")({
   loader: async (): Promise<{ listings: Listing[] }> => {
     const { data, error } = await supabase.from("listings").select("id,title,seller_username,badge,category,price_pi,image_url").eq("active", true).order("created_at");
@@ -18,10 +28,10 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "IFIOK — Safe Pi Escrow for Freelancers & Micro-Services" },
-      { name: "description", content: "Empowering Global Commerce & Pi Utilities Safely. Hire, sell and trade with smart escrow and anti-scam protection." },
-      { property: "og:title", content: "IFIOK — Safe Pi Escrow for Freelancers & Micro-Services" },
-      { property: "og:description", content: "Empowering Global Commerce & Pi Utilities Safely." },
+      { title: "IFIOK — Shop, Pay & Live Better with Pi" },
+      { name: "description", content: "From Mining to Spending — real goods, real services, real value. Shop groceries, electronics, fashion and services with Pi, protected by escrow." },
+      { property: "og:title", content: "IFIOK — Shop, Pay & Live Better with Pi" },
+      { property: "og:description", content: "Real Goods. Real Services. Real Pi. Safe shopping with escrow protection." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: IMAGES.hero },
@@ -75,16 +85,46 @@ function Index() {
       {status && <div className="bg-accent px-4 py-2 text-center text-xs text-accent-foreground">{status}</div>}
 
       <section className="relative overflow-hidden text-navy-foreground">
-        <img src={IMAGES.hero} alt="Freelancers collaborating around a laptop" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={IMAGES.hero} alt="Shoppers and local sellers" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-hero-fade" />
         <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-28">
-          <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1 text-xs text-primary"><ShieldCheck className="h-3.5 w-3.5" />Smart Escrow Protected</span>
-          <h1 className="mt-3 text-4xl font-extrabold leading-tight md:text-6xl">Empowering Global Commerce &amp; Pi Utilities <span className="text-gold">Safely.</span></h1>
-          <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-            {[["12,480", "Escrows completed"], ["99.2%", "Scam-free rate"], ["1,930", "Threats blocked"]].map(([n, l]) => (
-              <div key={l} className="rounded-xl bg-navy-foreground/10 p-3 backdrop-blur"><p className="font-display text-xl font-bold">{n}</p><p className="text-[10px] opacity-75">{l}</p></div>
+          <span className="inline-flex items-center gap-1 rounded-full bg-gold/25 px-3 py-1 text-xs text-gold"><ShieldCheck className="h-3.5 w-3.5" />Shop · Pay · Live Better</span>
+          <h1 className="mt-3 text-4xl font-extrabold leading-tight md:text-6xl">Real Goods. Real Services. <span className="text-gold">Real Pi.</span></h1>
+          <p className="mt-3 max-w-xl text-sm opacity-85">From Mining to Spending — IFIOK makes Pi useful in your everyday life, in Nigeria and worldwide.</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 pt-10">
+        <h2 className="text-2xl font-bold">Our Products &amp; Services</h2>
+        <p className="mb-4 text-sm text-muted-foreground">Quality products and trusted services, all in one place.</p>
+        <div className="grid grid-cols-3 gap-2 md:grid-cols-6">
+          {CATEGORIES.map((c) => (
+            <div key={c.name} className="overflow-hidden rounded-xl bg-card text-center shadow-card">
+              <img src={c.img} alt={c.name} loading="lazy" className="aspect-square w-full object-cover" />
+              <p className="px-1 pt-2 text-xs font-semibold text-primary">{c.name}</p>
+              <p className="px-1 pb-2 text-[10px] text-muted-foreground">{c.sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-5xl gap-4 px-4 pt-10 md:grid-cols-2">
+        <div className="rounded-2xl bg-card p-4 shadow-card">
+          <h2 className="text-xl font-bold">Payment Methods</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {[["Pi Network (Pi Coin)", "Available"], ["Bank Transfer", "Coming soon"], ["USSD", "Coming soon"], ["Mobile Money", "Coming soon"], ["Debit / Credit Card", "Coming soon"]].map(([m, s]) => (
+              <li key={m} className="flex justify-between"><span>{m}</span><span className={s === "Available" ? "font-semibold text-accent-foreground" : "text-muted-foreground"}>{s}</span></li>
             ))}
-          </div>
+          </ul>
+        </div>
+        <div className="rounded-2xl bg-card p-4 shadow-card">
+          <h2 className="flex items-center gap-2 text-xl font-bold"><ShieldCheck className="h-5 w-5 text-primary" />Security Against Scammers</h2>
+          <ul className="mt-3 space-y-1.5 text-sm">
+            {["Verified sellers and service providers", "Pi payments verified on our server", "Funds held in escrow until delivery", "Report and block suspicious activity"].map((t) => (
+              <li key={t} className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-accent-foreground" />{t}</li>
+            ))}
+          </ul>
+          <p className="mt-3 flex gap-2 rounded-lg bg-gold p-2 text-xs font-medium text-gold-foreground"><AlertTriangle className="h-4 w-4 shrink-0" />Never share your seed phrase, private keys or OTP with anyone.</p>
         </div>
       </section>
 
