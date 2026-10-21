@@ -18,9 +18,9 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "IFIOK — Pi Freelance Escrow & Micro-Services Hub" },
+      { title: "IFIOK — Safe Pi Escrow for Freelancers & Micro-Services" },
       { name: "description", content: "Empowering Global Commerce & Pi Utilities Safely. Hire, sell and trade with smart escrow and anti-scam protection." },
-      { property: "og:title", content: "IFIOK — Pi Freelance Escrow & Micro-Services Hub" },
+      { property: "og:title", content: "IFIOK — Safe Pi Escrow for Freelancers & Micro-Services" },
       { property: "og:description", content: "Empowering Global Commerce & Pi Utilities Safely." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
