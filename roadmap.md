@@ -1,4 +1,10 @@
 # Roadmap
+- [ ] Marketplace upgrade: secure admin access, live management records and audit log
+- [ ] Separate optional demo catalogue; disable demo checkout and unverified escrow claims
+- [ ] Seller profiles, applications, genuine photos and reviewed submissions
+- [ ] Protected Pi configuration with honest checks and gated payments
+- [ ] About, support, seller agreement, delivery/refund and problem reporting pages
+- [ ] Verify access controls, public flows and report outstanding setup
 - [x] Rebrand to purple/gold "Shop, Pay, Live Better" + homepage like showcase image (categories, payment methods, security, contact)
 - [x] Use real contact: +2348033584736, support@gasv.store
 - [ ] Product pages, search, cart, checkout, order tracking, receipts, reviews
