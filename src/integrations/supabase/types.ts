@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          details: Json
+          id: string
+          target_id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string
+        }
+        Relationships: []
+      }
+      demo_catalogue: {
+        Row: {
+          category: string
+          created_at: string
+          example_price_pi: number
+          id: string
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          example_price_pi: number
+          id?: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          example_price_pi?: number
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       escrow_orders: {
         Row: {
           amount_pi: number
@@ -85,6 +136,7 @@ export type Database = {
           delivery: string | null
           id: string
           image_url: string | null
+          legacy_demo: boolean
           price_pi: number
           seller_username: string
           stock: number | null
@@ -98,6 +150,7 @@ export type Database = {
           delivery?: string | null
           id?: string
           image_url?: string | null
+          legacy_demo?: boolean
           price_pi: number
           seller_username: string
           stock?: number | null
@@ -111,10 +164,104 @@ export type Database = {
           delivery?: string | null
           id?: string
           image_url?: string | null
+          legacy_demo?: boolean
           price_pi?: number
           seller_username?: string
           stock?: number | null
           title?: string
+        }
+        Relationships: []
+      }
+      marketplace_listings: {
+        Row: {
+          admin_note: string
+          category: string
+          created_at: string
+          delivery: string
+          description: string
+          featured: boolean
+          id: string
+          location: string
+          photo_path: string
+          price_pi: number
+          seller_id: string
+          status: string
+          stock: number
+          title: string
+        }
+        Insert: {
+          admin_note?: string
+          category: string
+          created_at?: string
+          delivery: string
+          description: string
+          featured?: boolean
+          id?: string
+          location: string
+          photo_path: string
+          price_pi: number
+          seller_id: string
+          status?: string
+          stock: number
+          title: string
+        }
+        Update: {
+          admin_note?: string
+          category?: string
+          created_at?: string
+          delivery?: string
+          description?: string
+          featured?: boolean
+          id?: string
+          location?: string
+          photo_path?: string
+          price_pi?: number
+          seller_id?: string
+          status?: string
+          stock?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      marketplace_settings: {
+        Row: {
+          categories: string[]
+          demo_enabled: boolean
+          homepage_message: string
+          hosting_url: string
+          id: string
+          pi_app_id: string
+          pi_app_name: string
+          pi_network: string
+          registered_url: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          categories?: string[]
+          demo_enabled?: boolean
+          homepage_message?: string
+          hosting_url?: string
+          id?: string
+          pi_app_id?: string
+          pi_app_name?: string
+          pi_network?: string
+          registered_url?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Update: {
+          categories?: string[]
+          demo_enabled?: boolean
+          homepage_message?: string
+          hosting_url?: string
+          id?: string
+          pi_app_id?: string
+          pi_app_name?: string
+          pi_network?: string
+          registered_url?: string
+          updated_at?: string
+          wallet_address?: string
         }
         Relationships: []
       }
@@ -130,6 +277,69 @@ export type Database = {
         Update: {
           created_at?: string
           pi_username?: string
+        }
+        Relationships: []
+      }
+      problem_reports: {
+        Row: {
+          admin_note: string
+          created_at: string
+          description: string
+          evidence_path: string | null
+          id: string
+          kind: string
+          order_code: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string
+          created_at?: string
+          description: string
+          evidence_path?: string | null
+          id?: string
+          kind: string
+          order_code?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string
+          created_at?: string
+          description?: string
+          evidence_path?: string | null
+          id?: string
+          kind?: string
+          order_code?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_path: string | null
+          created_at: string
+          display_name: string
+          id: string
+          pi_uid: string | null
+          pi_username: string | null
+        }
+        Insert: {
+          avatar_path?: string | null
+          created_at?: string
+          display_name?: string
+          id: string
+          pi_uid?: string | null
+          pi_username?: string | null
+        }
+        Update: {
+          avatar_path?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          pi_uid?: string | null
+          pi_username?: string | null
         }
         Relationships: []
       }
@@ -177,14 +387,83 @@ export type Database = {
           },
         ]
       }
+      seller_applications: {
+        Row: {
+          admin_note: string
+          created_at: string
+          delivery: string
+          description: string
+          id: string
+          location: string
+          status: string
+          store_name: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string
+          created_at?: string
+          delivery: string
+          description: string
+          id?: string
+          location: string
+          status?: string
+          store_name: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string
+          created_at?: string
+          delivery?: string
+          description?: string
+          id?: string
+          location?: string
+          status?: string
+          store_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      bootstrap_marketplace_admin: {
+        Args: { target_user: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      manage_marketplace: {
+        Args: { action: string; payload?: Json; target?: string }
+        Returns: undefined
+      }
     }
     Enums: {
+      app_role: "admin" | "seller" | "user"
       escrow_status:
         | "created"
         | "deposited"
@@ -321,6 +600,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "seller", "user"],
       escrow_status: [
         "created",
         "deposited",
