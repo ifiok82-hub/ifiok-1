@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Add uploaded storefront search and category filters while preserving the homepage
+- [ ] Resolve public marketplace settings exposure (automatic security finding)
 - [ ] Marketplace upgrade: secure admin access, live management records and audit log
 - [ ] Separate optional demo catalogue; disable demo checkout and unverified escrow claims
 - [ ] Seller profiles, applications, genuine photos and reviewed submissions
