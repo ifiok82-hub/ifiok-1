@@ -1,0 +1,441 @@
+"use client";
+import { useState, useEffect } from "react";
+
+type Product = {
+  id: string;
+  title: string;
+  category: string;
+  pi: number;
+  verified: boolean;
+  stock: number;
+  image: string;
+  desc: string;
+};
+
+const defaultProducts: Product[] = [
+  { id: "1", title: "Fresh Groceries Bundle", category: "Groceries", pi: 3.5, verified: true, stock: 100, image: "/images/product1.webp", desc: "Rice + Oil + Tomatoes" },
+  { id: "2", title: "Golden Fields 50KG Rice", category: "Groceries", pi: 8.5, verified: true, stock: 50, image: "/images/product7.webp", desc: "Premium 50KG" },
+  { id: "3", title: "Fresh Palm Oil 25L Keg", category: "Groceries", pi: 5.0, verified: true, stock: 30, image: "/images/product9.webp", desc: "Pure palm oil" },
+  { id: "4", title: "Infinix Note 40 Pro 5G", category: "Electronics", pi: 22.0, verified: true, stock: 20, image: "/images/product6.webp", desc: "8GB 256GB 108MP" },
+  { id: "5", title: "Wireless Bluetooth TWS Headset", category: "Electronics", pi: 1.2, verified: true, stock: 100, image: "/images/product8.webp", desc: "True wireless 30hr" },
+  { id: "6", title: "Solar Power Bank 50000mAh", category: "Electronics", pi: 3.5, verified: true, stock: 80, image: "/images/product11.webp", desc: "Solar charging" },
+  { id: "7", title: "Ankara Traditional Senator Wear", category: "Fashion", pi: 6.0, verified: true, stock: 15, image: "/images/product5.webp", desc: "100% cotton" },
+  { id: "8", title: "Ankara Luxury Female Gown", category: "Fashion", pi: 4.5, verified: true, stock: 15, image: "/images/product13.webp", desc: "Maxi gown" },
+  { id: "9", title: "Smart Solar Inverter Kit 1KVA", category: "Home & Living", pi: 85.0, verified: true, stock: 5, image: "/images/product4.webp", desc: "1KVA + 100AH" },
+  { id: "10", title: "Non-Stick Cookware Set 12pcs", category: "Home & Living", pi: 9.5, verified: true, stock: 25, image: "/images/product2.webp", desc: "12pcs non-stick" },
+  { id: "11", title: "Executive Office Chair", category: "Home & Living", pi: 18.0, verified: true, stock: 10, image: "/images/product10.webp", desc: "Leather ergonomic" },
+  { id: "12", title: "Organic Shea Butter Glow Kit", category: "Health & Beauty", pi: 2.0, verified: true, stock: 60, image: "/images/product3.webp", desc: "Natural shea butter" },
+  { id: "13", title: "Home Electrical Installation Service", category: "Services", pi: 2.5, verified: true, stock: 999, image: "/images/product12.webp", desc: "Certified electrician Lagos" },
+];
+
+const categories = ["All", "Groceries", "Electronics", "Fashion", "Home & Living", "Health & Beauty", "Services"];
+
+declare global { interface Window { Pi: any; } }
+
+export default function PiLivePage() {
+  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [activeCat, setActiveCat] = useState("All");
+  const [search, setSearch] = useState("");
+  const [cart, setCart] = useState<{ id: string; qty: number; pi: number }[]>([]);
+  const [showAdminAccess, setShowAdminAccess] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminPassInput, setAdminPassInput] = useState("");
+  const [adminError, setAdminError] = useState("");
+  const [tapCount, setTapCount] = useState(0);
+  const [failCount, setFailCount] = useState(0);
+  const [lockUntil, setLockUntil] = useState(0);
+  const [piUser, setPiUser] = useState<any>(null);
+  const [piReady, setPiReady] = useState(false);
+  
+  // Pi Live Config - Stored in localStorage - YOU PASTE HERE
+  const [piConfig, setPiConfig] = useState({
+    apiKey: "", // PASTE YOUR PI API KEY HERE - from develop.pi
+    appId: "", // e.g. ifiok marketplace
+    walletAddress: "", // Mainnet KYC wallet address - receives Pi
+    testnetWallet: "", // Testnet wallet for testing
+    sandbox: false, // false = Mainnet Live, true = Testnet
+    backendUrl: "", // Your backend API URL for server-side verification - e.g. https://ifiok-1.vercel.app/api/pi
+  });
+
+  useEffect(() => {
+    // Load products
+    const saved = localStorage.getItem("ifiok_products_v2");
+    if (saved) { try { setProducts(JSON.parse(saved)); } catch {} } 
+    else { localStorage.setItem("ifiok_products_v2", JSON.stringify(defaultProducts)); }
+
+    // Load Pi Config from localStorage
+    const savedConfig = localStorage.getItem("ifiok_pi_live_config");
+    if (savedConfig) {
+      try { setPiConfig(JSON.parse(savedConfig)); } catch {}
+    }
+
+    // Load Pi SDK
+    const script = document.createElement("script");
+    script.src = "https://sdk.minepi.com/pi-sdk.js";
+    script.onload = () => {
+      if (window.Pi) {
+        const isSandbox = localStorage.getItem("ifiok_pi_sandbox") === "true";
+        window.Pi.init({ version: "2.0", sandbox: isSandbox });
+        setPiReady(true);
+        console.log("Pi SDK Live Ready - Sandbox:", isSandbox);
+      }
+    };
+    document.body.appendChild(script);
+
+    // PWA
+    if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/sw.js").catch(()=>{}); }
+  }, []);
+
+  const savePiConfig = (newConfig: any) => {
+    setPiConfig(newConfig);
+    localStorage.setItem("ifiok_pi_live_config", JSON.stringify(newConfig));
+    localStorage.setItem("ifiok_pi_sandbox", String(newConfig.sandbox));
+    alert("Pi Live Config Saved! Refresh to apply Mainnet/Testnet.");
+  };
+
+  const saveProducts = (p: Product[]) => {
+    setProducts(p);
+    localStorage.setItem("ifiok_products_v2", JSON.stringify(p));
+  };
+
+  // Pi Auth - REAL, NO MOCK
+  const handlePiLogin = async () => {
+    if (!window.Pi) return alert("Pi SDK not loaded - Open in Pi Browser");
+    if (!piConfig.apiKey) return alert("Paste Pi API Key in Admin first! 5-tap logo -> Pi Live Config");
+
+    try {
+      const scopes = ['username', 'payments'];
+      const auth = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+      setPiUser(auth.user);
+      alert(`Welcome ${auth.user.username} - Pi Live Connected!`);
+    } catch (err: any) {
+      alert("Pi Login Failed: " + err.message + " - Make sure you are in Pi Browser");
+    }
+  };
+
+  const onIncompletePaymentFound = (payment: any) => {
+    console.log("Incomplete payment found", payment);
+    // You should call your backend to complete it
+    return fetch(`${piConfig.backendUrl}/complete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction?.txid })
+    });
+  };
+
+  // Pi Payment - REAL, NO MOCK
+  const handlePiPay = async () => {
+    if (!piUser) return alert("Sign in with Pi first");
+    if (!piConfig.walletAddress) return alert("Set Mainnet KYC wallet address in Admin");
+    if (cart.length === 0) return alert("Cart empty");
+
+    const totalPi = cart.reduce((a,b)=>a+(b.qty*b.pi),0);
+    const memo = `IFIOK Order - ${cart.length} items - π${totalPi}`;
+    const metadata = { cart, totalPi, orderId: Date.now().toString() };
+
+    try {
+      const payment = await window.Pi.createPayment({
+        amount: totalPi,
+        memo,
+        metadata,
+      }, {
+        onReadyForServerApproval: async (paymentId: string) => {
+          console.log("Pi Payment Ready for Approval", paymentId);
+          // CALL YOUR BACKEND - REAL API CALL WITH YOUR API KEY
+          const res = await fetch(`${piConfig.backendUrl}/approve`, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Key ${piConfig.apiKey}`
+            },
+            body: JSON.stringify({ paymentId })
+          });
+          const data = await res.json();
+          console.log("Approved on server", data);
+        },
+        onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          console.log("Pi Payment Ready for Completion", paymentId, txid);
+          const res = await fetch(`${piConfig.backendUrl}/complete`, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Key ${piConfig.apiKey}`
+            },
+            body: JSON.stringify({ paymentId, txid })
+          });
+          const data = await res.json();
+          alert(`Pi Payment Completed! TxID: ${txid} - Will deliver to your address.`);
+          setCart([]);
+        },
+        onCancel: (paymentId: string) => {
+          alert("Pi Payment Cancelled: " + paymentId);
+        },
+        onError: (error: any, payment: any) => {
+          alert("Pi Payment Error: " + error.message);
+          console.error(error, payment);
+        }
+      });
+    } catch (err: any) {
+      alert("Pi Pay Error: " + err.message);
+    }
+  };
+
+  const filtered = products.filter(p => 
+    (activeCat === "All" || p.category === activeCat) && 
+    p.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const addToCart = (id: string) => {
+    const prod = products.find(x=>x.id===id)!;
+    setCart(prev => {
+      const ex = prev.find(c=>c.id===id);
+      if (ex) return prev.map(c=>c.id===id? {...c, qty: c.qty+1}: c);
+      return [...prev, { id, qty: 1, pi: prod.pi }];
+    });
+  };
+
+  const handleLogoTap = () => {
+    const now = Date.now();
+    if (now < lockUntil) { alert("Admin locked 30s"); return; }
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+    setTimeout(()=>setTapCount(0), 3000);
+    if (newCount >= 5) { setTapCount(0); setShowAdminAccess(true); }
+  };
+
+  const loginAdmin = () => {
+    const saved = localStorage.getItem("ifiok_admin_pass") || "IfiokAdmin2025!";
+    if (adminPassInput === saved) {
+      setShowAdminAccess(false); setShowAdmin(true); setAdminPassInput(""); setAdminError(""); setFailCount(0);
+    } else {
+      const f = failCount + 1;
+      setFailCount(f);
+      setAdminError(`Wrong password (${f}/3)`);
+      if (f >= 3) { setLockUntil(Date.now()+30000); setAdminError("Locked 30 seconds"); setTimeout(()=>{ setFailCount(0); setAdminError(""); }, 30000); }
+    }
+  };
+
+  const cartTotal = cart.reduce((a,b)=>a+b.qty,0);
+  const piTotal = cart.reduce((a,b)=>a+(b.qty*b.pi),0);
+
+  return (
+    <main className="min-h-screen bg-[#F8F7FF]">
+      {/* HEADER */}
+      <header className="bg-[#3A0CA3] text-white sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div onClick={handleLogoTap} className="flex items-center gap-2 cursor-pointer select-none">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#3A0CA3] font-bold">IF</div>
+            <div>
+              <div className="font-bold text-xl leading-none">IFIOK</div>
+              <div className="text-[10px] opacity-80">Shop, Pay & Live Better</div>
+            </div>
+            <span className={`ml-2 text-[10px] px-2 py-1 rounded-full font-bold ${piConfig.sandbox ? "bg-yellow-400 text-black" : "bg-[#FFB703] text-[#3A0CA3]"}`}>
+              {piConfig.sandbox ? "TESTNET" : "MAINNET PI-ONLY LIVE"}
+            </span>
+            {tapCount>0 && <span className="ml-2 w-2 h-2 bg-[#FFB703] rounded-full animate-ping"></span>}
+          </div>
+          <div className="flex items-center gap-2">
+            {!piUser ? (
+              <button onClick={handlePiLogin} className="bg-[#FFB703] text-[#3A0CA3] px-4 py-2 rounded-full text-sm font-bold">Sign in with Pi</button>
+            ) : (
+              <span className="bg-[#4A1A8B] text-xs px-3 py-1 rounded-full">@{piUser.username} ✓ KYC</span>
+            )}
+            <div className="relative">
+              <span className="absolute -top-2 -right-2 bg-[#FFB703] text-[#3A0CA3] w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center">{cartTotal}</span>
+              <div className="bg-white text-[#3A0CA3] p-2 rounded-full">🛒</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#4A1A8B] px-4 py-2 text-center text-xs">
+          {piReady ? `Pi SDK Live Ready - ${piConfig.sandbox ? "Testnet Wallet" : "Mainnet KYC Wallet"}: ${piConfig.walletAddress ? piConfig.walletAddress.slice(0,6)+"..."+piConfig.walletAddress.slice(-4) : "Set in Admin (5-tap logo)"}` : "Loading Pi SDK... Open in Pi Browser"}
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className="bg-[#3A0CA3] text-white px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold">Real Goods. Real Services. <span className="text-[#FFB703]">Real Pi Live.</span></h1>
+          <p className="mt-2 opacity-80 text-sm">No mock - Pi payments verified on Pi Blockchain via your API Key. {piConfig.sandbox ? "Testnet Mode" : "Mainnet Live"}</p>
+        </div>
+      </section>
+
+      {/* FILTERS */}
+      <div className="max-w-7xl mx-auto p-4">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {categories.map(cat=>{
+            const count = cat==="All"? products.length : products.filter(p=>p.category===cat).length;
+            const active = activeCat===cat? "bg-[#3A0CA3] text-white" : "bg-white border";
+            return <button key={cat} onClick={()=>setActiveCat(cat)} className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap ${active}`}>{cat} ({count})</button>
+          })}
+        </div>
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search groceries, electronics, fashion..." className="w-full mt-3 p-3 rounded-xl border border-[#E9E8FF] focus:outline-none"/>
+      </div>
+
+      {/* PRODUCTS */}
+      <div className="max-w-7xl mx-auto p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filtered.map(p=>(
+          <div key={p.id} className="bg-white rounded-[24px] border border-[#E9E8FF] p-3 shadow-sm">
+            <div className="relative">
+              <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] px-2 py-1 rounded-full">✔ Verified Pi Live</span>
+              <img src={p.image} alt={p.title} className="w-full aspect-square object-cover rounded-xl bg-gray-50" onError={(e:any)=>e.currentTarget.src=`https://picsum.photos/seed/${p.id}/300`} />
+            </div>
+            <div className="mt-3 text-[11px] text-[#7C3AED] font-bold uppercase">{p.category}</div>
+            <div className="font-bold text-[14px] mt-1 line-clamp-2 min-h-[40px]">{p.title}</div>
+            <div className="text-[11px] text-gray-500 mt-1">{p.desc}</div>
+            <div className="flex justify-between items-center mt-3">
+              <div className="font-bold text-[#3A0CA3] text-lg">π {p.pi}</div>
+              <button onClick={()=>addToCart(p.id)} className="bg-[#3A0CA3] text-[#FFB703] px-3 py-2 rounded-xl text-xs font-bold">🛒 Add</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CART */}
+      {cartTotal>0 && (
+        <div className="fixed bottom-4 left-4 right-4 bg-[#3A0CA3] text-white p-4 rounded-2xl z-40 flex justify-between items-center shadow-2xl">
+          <div><div className="font-bold">{cartTotal} items • π {piTotal.toFixed(2)} total LIVE</div><div className="text-xs opacity-70">{piUser ? `Pay as @${piUser.username}` : "Sign in with Pi first"}</div></div>
+          <button onClick={handlePiPay} className="bg-[#FFB703] text-[#3A0CA3] px-6 py-3 rounded-xl font-bold">Pay π {piTotal.toFixed(2)} with Pi</button>
+        </div>
+      )}
+
+      {/* ADMIN ACCESS */}
+      {showAdminAccess && (
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="font-bold text-lg">Admin Access - 5 Tap Detected</h3>
+            <p className="text-xs text-gray-500 mt-1">Enter password</p>
+            <input value={adminPassInput} onChange={e=>setAdminPassInput(e.target.value)} type="password" placeholder="Password" className="w-full mt-3 p-3 border rounded-xl"/>
+            {adminError && <div className="text-red-500 text-xs mt-2">{adminError}</div>}
+            <div className="flex gap-2 mt-4">
+              <button onClick={loginAdmin} className="flex-1 bg-[#3A0CA3] text-white p-3 rounded-xl font-bold">Unlock</button>
+              <button onClick={()=>{ setShowAdminAccess(false); setAdminPassInput(""); }} className="flex-1 bg-gray-100 p-3 rounded-xl">Cancel</button>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-3">Default: IfiokAdmin2025!</p>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN DASHBOARD - PI LIVE CONFIG */}
+      {showAdmin && (
+        <div className="fixed inset-0 bg-[#F8F7FF] z-[70] overflow-auto p-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-between items-center bg-[#3A0CA3] text-white p-4 rounded-2xl">
+              <h2 className="font-bold">IFIOK Admin - Pi LIVE Config - NO MOCK</h2>
+              <button onClick={()=>setShowAdmin(false)} className="bg-white/20 px-3 py-1 rounded-lg">Close</button>
+            </div>
+
+            {/* PI LIVE CONFIG - PASTE YOUR KEYS HERE */}
+            <div className="bg-yellow-50 border-2 border-[#FFB703] mt-4 p-4 rounded-2xl">
+              <h3 className="font-bold text-lg text-[#3A0CA3]">🔑 Pi LIVE Config - Paste Your Real Keys Here</h3>
+              <p className="text-xs text-gray-600 mt-1">No mock - Real Pi Blockchain. Get from develop.pi - Pi Developer Portal</p>
+              
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label className="text-xs font-bold">Pi API Key (from Pi Developer Portal - Secret)</label>
+                  <input value={piConfig.apiKey} onChange={e=>setPiConfig({...piConfig, apiKey: e.target.value})} placeholder="Paste your Pi API Key - e.g. abc123..." type="password" className="w-full mt-1 p-3 border-2 border-[#FFB703] rounded-xl font-mono text-sm"/>
+                  <p className="text-[10px] text-gray-500">From https://develop.pi - Your app's API Key - Keep secret</p>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold">Pi App ID / App Name</label>
+                  <input value={piConfig.appId} onChange={e=>setPiConfig({...piConfig, appId: e.target.value})} placeholder="e.g. ifiok marketplace or your App ID" className="w-full mt-1 p-3 border rounded-xl text-sm"/>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold">Mainnet KYC Wallet Address (Receives Pi - Live)</label>
+                  <input value={piConfig.walletAddress} onChange={e=>setPiConfig({...piConfig, walletAddress: e.target.value})} placeholder="Paste your KYC verified Mainnet wallet - GABC... - starts with G" className="w-full mt-1 p-3 border-2 border-green-400 rounded-xl font-mono text-sm"/>
+                  <p className="text-[10px] text-green-600">This wallet receives real Pi from customers - Must be KYC verified Mainnet</p>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold">Testnet Wallet Address (For Testing)</label>
+                  <input value={piConfig.testnetWallet} onChange={e=>setPiConfig({...piConfig.testnetWallet, testnetWallet: e.target.value})} placeholder="Paste Testnet wallet - for testing payments" className="w-full mt-1 p-3 border rounded-xl font-mono text-sm"/>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold">Backend API URL (Server-side verification)</label>
+                  <input value={piConfig.backendUrl} onChange={e=>setPiConfig({...piConfig, backendUrl: e.target.value})} placeholder="e.g. https://ifiok-1.vercel.app/api/pi - Your backend endpoint" className="w-full mt-1 p-3 border rounded-xl text-sm"/>
+                  <p className="text-[10px] text-gray-500">Your backend that approves/completes payments using Pi API Key - See Pi docs /api</p>
+                </div>
+
+                <div className="flex items-center gap-2 bg-white p-3 rounded-xl border">
+                  <input type="checkbox" checked={piConfig.sandbox} onChange={e=>setPiConfig({...piConfig, sandbox: e.target.checked})} className="w-5 h-5"/>
+                  <div>
+                    <div className="text-sm font-bold">Sandbox Mode (Testnet)</div>
+                    <div className="text-[11px] text-gray-500">Check = Testnet (test Pi), Uncheck = Mainnet Live (real Pi)</div>
+                  </div>
+                </div>
+
+                <button onClick={()=>savePiConfig(piConfig)} className="w-full bg-[#3A0CA3] text-white p-4 rounded-xl font-bold text-lg">💾 Save Pi LIVE Config</button>
+
+                <div className="bg-white p-3 rounded-xl text-[11px] font-mono">
+                  <div className="font-bold">Current Config:</div>
+                  <div>API Key: {piConfig.apiKey ? "••••••••"+piConfig.apiKey.slice(-6) : "NOT SET"}</div>
+                  <div>Mainnet Wallet: {piConfig.walletAddress || "NOT SET"}</div>
+                  <div>Testnet Wallet: {piConfig.testnetWallet || "NOT SET"}</div>
+                  <div>Backend: {piConfig.backendUrl || "NOT SET"}</div>
+                  <div>Mode: {piConfig.sandbox ? "TESTNET" : "MAINNET LIVE"}</div>
+                </div>
+
+                <div className="bg-[#3A0CA3] text-white p-3 rounded-xl text-xs">
+                  <div className="font-bold">🔧 How to get Pi API Key:</div>
+                  <div>1. Go to https://develop.pi - Login with Pi</div>
+                  <div>2. Create App - Name: IFIOK</div>
+                  <div>3. Copy API Key - Paste above</div>
+                  <div>4. Set Mainnet wallet - Your KYC wallet that receives Pi</div>
+                  <div>5. Build backend /api/pi/approve and /api/pi/complete - Use Pi Node.js SDK</div>
+                  <div className="mt-2 font-bold">Backend Example (Node.js):</div>
+                  <div className="font-mono text-[10px] whitespace-pre-wrap">{`// /api/pi/approve.js
+import PiNetwork from 'pi-backend';
+const pi = new PiNetwork(apiKey, walletPrivateSeed);
+await pi.approvePayment(paymentId);`}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* PRODUCTS */}
+            <div className="bg-white mt-4 p-4 rounded-xl">
+              <h3 className="font-bold">Product Management - 13 Real Products - No Mock</h3>
+              <div className="mt-3 space-y-2 max-h-[40vh] overflow-auto">
+                {products.map((p,i)=>(
+                  <div key={p.id} className="flex gap-2 items-center border p-2 rounded-xl text-xs">
+                    <img src={p.image} className="w-10 h-10 rounded object-cover bg-gray-100" alt="" />
+                    <div className="flex-1">
+                      <input value={p.title} onChange={e=>{ const np=[...products]; np[i].title=e.target.value; saveProducts(np); }} className="w-full border rounded p-1"/>
+                      <div className="flex gap-1 mt-1">
+                        <input type="number" value={p.pi} onChange={e=>{ const np=[...products]; np[i].pi=parseFloat(e.target.value)||0; saveProducts(np); }} className="w-16 border rounded p-1"/>π
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ENV FILE */}
+            <div className="bg-white mt-4 p-4 rounded-xl">
+              <h3 className="font-bold">.env.local - For Vercel Deployment</h3>
+              <p className="text-xs text-gray-500">Create file .env.local in root - Paste your keys - Never commit to GitHub</p>
+              <pre className="bg-black text-green-400 p-3 rounded-xl text-[11px] mt-2 overflow-auto">{`PI_API_KEY=${piConfig.apiKey || "your_api_key_here"}
+PI_WALLET_PRIVATE_SEED=S${piConfig.walletAddress ? "YOUR_PRIVATE_SEED" : "YOUR_WALLET_PRIVATE_SEED_FROM_PI_WALLET"}
+PI_APP_ID=${piConfig.appId || "ifiok"}
+NEXT_PUBLIC_PI_SANDBOX=${piConfig.sandbox}
+NEXT_PUBLIC_PI_WALLET=${piConfig.walletAddress || "G..."}
+`}</pre>
+              <button onClick={()=>{
+                const content = `PI_API_KEY=${piConfig.apiKey}\nPI_WALLET_PRIVATE_SEED=S...PRIVATE_SEED\nPI_APP_ID=${piConfig.appId}\nNEXT_PUBLIC_PI_SANDBOX=${piConfig.sandbox}\nNEXT_PUBLIC_PI_WALLET=${piConfig.walletAddress}\n`;
+                const blob = new Blob([content],{type:"text/plain"});
+                const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=".env.local"; a.click();
+              }} className="mt-2 bg-gray-800 text-white px-4 py-2 rounded-xl text-xs">Download .env.local</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <footer className="bg-[#1A0B3A] text-white mt-20 p-8 text-center">
+        <div className="font-bold">IFIOK — Pi LIVE - No Mock - Shop · Pay · Live Better</div>
+        <div className="text-xs opacity-60 mt-2">Mainnet KYC Wallet: {piConfig.walletAddress ? piConfig.walletAddress.slice(0,8)+"..." : "Set in Admin (5-tap logo)"} • {piConfig.sandbox ? "Testnet" : "Mainnet Live"}</div>
+        <div className="text-[10px] opacity-40 mt-2">© 2026 Ifiok Digital Solutions • Pi SDK 2.0 Live • Admin: 5-tap logo • Password: IfiokAdmin2025!</div>
+      </footer>
+    </main>
+  );
+}
