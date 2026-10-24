@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, Lock, AlertTriangle, Store, CheckCircle2, Wallet, Globe2, BadgeCheck } from "lucide-react";
+import { ShieldCheck, Lock, AlertTriangle, Store, CheckCircle2, Wallet, Globe2, BadgeCheck, Search, X } from "lucide-react";
 import { IFIOKLogo } from "@/components/IFIOKLogo";
 import { Footer } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { CURRENCIES, ESCROW_STAGES, IMAGES, LISTINGS, formatFiat, scanForFraud, type CurrencyCode } from "@/lib/ifiok";
 import { getPi, initiateIFIOKEscrowPayment, isPiBrowser, piAuthenticate } from "@/lib/pi";
 import { supabase } from "@/integrations/supabase/client";
+import { filterListings } from "@/lib/marketplace-filters";
 
 type Listing = { id: string; title: string; seller: string; badge: string; price: number; img: string; cat: string };
 
@@ -51,7 +52,13 @@ function Index() {
   const [stage, setStage] = useState(1);
   const [reportOpen, setReportOpen] = useState(false);
   const [frozen, setFrozen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
   useEffect(() => { setInPi(isPiBrowser() || !!getPi()); }, []);
+
+  const filteredListings = filterListings(listings, search, activeCategory);
+  const filterCategories = ["All", ...new Set([...CATEGORIES.map((category) => category.name), ...listings.map((listing) => listing.cat)])];
+  const clearFilters = () => { setSearch(""); setActiveCategory("All"); };
 
   const rate = rates[cur] ?? 1;
   const signIn = async () => {
@@ -99,11 +106,11 @@ function Index() {
         <p className="mb-4 text-sm text-muted-foreground">Quality products and trusted services, all in one place.</p>
         <div className="grid grid-cols-3 gap-2 md:grid-cols-6">
           {CATEGORIES.map((c) => (
-            <div key={c.name} className="overflow-hidden rounded-xl bg-card text-center shadow-card">
+            <Button key={c.name} variant="ghost" aria-label={`Browse ${c.name}`} aria-pressed={activeCategory === c.name} onClick={() => { setActiveCategory(c.name); document.getElementById("marketplace")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" }); }} className="h-auto min-w-0 flex-col gap-0 overflow-hidden whitespace-normal rounded-xl bg-card p-0 text-center shadow-card">
               <img src={c.img} alt={c.name} loading="lazy" className="aspect-square w-full object-cover" />
               <p className="px-1 pt-2 text-xs font-semibold text-primary">{c.name}</p>
               <p className="px-1 pb-2 text-[10px] text-muted-foreground">{c.sub}</p>
-            </div>
+            </Button>
           ))}
         </div>
       </section>
@@ -128,11 +135,21 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-10">
+      <section id="marketplace" className="mx-auto max-w-5xl scroll-mt-24 px-4 py-10">
         <h2 className="text-2xl font-bold">Verified Marketplace</h2>
         <p className="mb-5 text-sm text-muted-foreground">Prices in Pi, shown in {cur} at your reference rate.</p>
+        <div role="search" className="relative mb-3">
+          <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <input type="search" aria-label="Search products and services" placeholder="Search products and services" value={search} onChange={(event) => setSearch(event.target.value)} className="h-10 w-full rounded-md border border-input bg-card pl-10 pr-12 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+          {search && <Button variant="ghost" size="icon" aria-label="Clear search" title="Clear search" onClick={() => setSearch("")} className="absolute right-1 top-0.5"><X /></Button>}
+        </div>
+        <div role="group" aria-label="Filter by category" className="mb-4 flex flex-wrap gap-2">
+          {filterCategories.map((category) => <Button key={category} size="sm" variant={activeCategory === category ? "default" : "outline"} aria-pressed={activeCategory === category} onClick={() => setActiveCategory(category)}>{category}</Button>)}
+        </div>
+        <p role="status" aria-live="polite" className="mb-3 text-xs text-muted-foreground">{filteredListings.length} {filteredListings.length === 1 ? "result" : "results"}{activeCategory !== "All" ? ` in ${activeCategory}` : ""}</p>
+        {!filteredListings.length && <div className="border-y py-10 text-center"><Search className="mx-auto mb-3 h-6 w-6 text-muted-foreground" /><h3 className="font-semibold">No matching products or services</h3><Button variant="link" onClick={clearFilters}>Clear filters</Button></div>}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {listings.map((l) => (
+          {filteredListings.map((l) => (
             <article key={l.id} className="overflow-hidden rounded-2xl bg-card shadow-card">
               <img src={l.img} alt={l.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />
               <div className="space-y-1 p-3">

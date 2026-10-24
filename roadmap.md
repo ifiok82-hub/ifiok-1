@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add uploaded storefront search and category filters while preserving the homepage
+- [x] Resolve public marketplace settings exposure (automatic security finding)
 - [ ] Marketplace upgrade: secure admin access, live management records and audit log
 - [ ] Separate optional demo catalogue; disable demo checkout and unverified escrow claims
 - [ ] Seller profiles, applications, genuine photos and reviewed submissions
@@ -7,7 +9,7 @@
 - [ ] Verify access controls, public flows and report outstanding setup
 - [x] Rebrand to purple/gold "Shop, Pay, Live Better" + homepage like showcase image (categories, payment methods, security, contact)
 - [x] Use real contact: +2348033584736, support@gasv.store
-- [ ] Product pages, search, cart, checkout, order tracking, receipts, reviews
+- [ ] Product pages, cart, checkout, order tracking, receipts, reviews
 - [ ] Seller registration, verified vendors, admin dashboard
 - [ ] Refund, delivery, seller agreement, cookie notice, dispute policies
 - [ ] Schedule auto-release job; moderator page; wire Report scam

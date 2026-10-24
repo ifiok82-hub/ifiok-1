@@ -14,3 +14,5 @@
 - Administrative mutations use an audited database RPC so the action and audit record commit together.
 - Pi payments and legacy escrow release endpoints fail closed until end-to-end payment and custody verification is implemented.
 - First-admin provisioning requires a verified account matching a server-only INITIAL_ADMIN_EMAIL and an atomic one-time role assignment.
+- Homepage search and category filters share the pure marketplace-filters helper; filtering never adds stock or changes listing eligibility.
+- Marketplace settings are readable only by database-verified admins; public browsing does not query operational configuration.
